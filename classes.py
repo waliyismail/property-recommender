@@ -4,14 +4,14 @@ import math
 import numpy_financial as npf
 from ml import ML
 
-data = pd.read_csv('src/data/kl_cleaned_v2.csv')
-
 def runMachineLearning():
+    data = pd.read_csv('src/data/kl_cleaned_v2.csv')
     ml = ML(data)
-    return pickle.load(open('../similarity.pkl','rb'))
+    ml.run()
+    return pickle.load(open('src/data/similarity.pkl','rb'))
 
 class Property:
-    def __init__(self, index):
+    def __init__(self, index, data):
         self._index = index
         self.property = data.iloc[index]
         self._scheme = self.property.scheme.rstrip().title()
@@ -47,7 +47,7 @@ class Filter:
         self._minprice = minprice
         self._maxprice = maxprice
 
-    def filter(self):
+    def filter(self, data):
         df = data
 
         if self._schemes:

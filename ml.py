@@ -29,9 +29,9 @@ class ML:
         for feature in self._features:
             self._data[feature] = self._data[feature].apply(clean_data)
         
-        self._data['desc'] = data.apply(combineField, axis=1)
+        self._data['desc'] = self._data.apply(combineField, axis=1)
         count = CountVectorizer(stop_words='english')
         count_matrix = count.fit_transform(data['desc'])
         cosine_sim = cosine_similarity(count_matrix, count_matrix)
 
-        pickle.dump(cosine_sim,open('similarity.pkl','wb'))
+        pickle.dump(cosine_sim,open('src/data/similarity.pkl','wb'))
