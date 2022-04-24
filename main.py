@@ -17,14 +17,14 @@ def main():
     if( page == 'propdetails'):
         print(1)
         PAGES["propdetails"]()
-        PAGES["recommend"]()
+        PAGES["recommend"](-1)
     elif(page == 'affordability'):
         print(2)
         PAGES['affordability']()
     else:
         print(3)
         PAGES["filter"]()
-        PAGES["recommend"]()
+        PAGES["recommend"](-1)
     print("=====one loop====")
 
 PAGES = {

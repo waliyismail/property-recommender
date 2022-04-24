@@ -1,3 +1,4 @@
+from ml import runMachineLearning
 import streamlit as st
 from persist import persist
 from itertools import cycle
@@ -41,9 +42,9 @@ def showEval(eval):
     with st.container():
         # find property below max loan
         st.text("Consider these property below")
-        # recommendAffordable()
+        # set affordable property page
+        st.session_state['filter_price'] = True
     
-    st.button("Back Home")
 class App:
     def __init__(self, data):
         self._data = data
@@ -113,16 +114,18 @@ class App:
 
 
 
-    def recommends(self):
+    def recommends(self , ml):
 
         arr = random.sample(range(0,self._data.shape[0]),5)
         print(st.session_state['page'])
+
         if (st.session_state['page'] == 'propdetails'):
             print("similar")
             st.header("Top similar property")
             p = Property(st.session_state['selected_prop'], self._data)
             r = Recommendation(p,self._data)
-            arr = r.recommendSimilar()
+            arr = r.recommendSimilar(ml)
+            
         elif (st.session_state['page'] == 'recommends'):
             print("random")
             st.header("Top property for you")
@@ -132,6 +135,7 @@ class App:
         
         for i in range(4):
             p = Property(arr[i], self._data)
+                
             type = p.property.type + "/" + str(i+1)
             # imgpath = "src/images/"+ type  + ".jpg"
             # img = Image.open(imgpath)
@@ -168,4 +172,7 @@ class App:
             afford = Affordability(prop,dp,sal,pcb,loan,loanterm,rate)
             eval = afford.evalAffordability()
             showEval(eval)
+            runMachineLearning(df)
+            st.header("Top similar property")
+            self.recommends(int(eval['max loan']))
             st.session_state['page'] = "home"

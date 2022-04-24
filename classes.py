@@ -98,6 +98,7 @@ class Recommendation:
     def recommendSimilar(self):
         # return similar properties
         index = self._property.index
+
         # distances = sorted(list(enumerate(self._similarities[index])), reverse=True, key=lambda x: x[1])
         # distances = distances[1:6]
         #arr = [i[0] for i in distances]
@@ -115,6 +116,11 @@ class Affordability:
         self._loanterm = loanterm
         self._interest = interest
     
+    def filterAffordable(self, data, maxloan):  
+        df = data
+        df =df[(df['price'] <= (maxloan))]
+        return df
+
     def evalAffordability(self):
         net_income = self._salary - self._pcb
         commitment = self._loans
