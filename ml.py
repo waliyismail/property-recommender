@@ -24,7 +24,8 @@ def combineField(x):
 def runMachineLearning(data):
     ml = ML(data)
     ml.run()
-    return pickle.load(open('src/data/similarity.pkl','rb'))
+    similarity = pickle.load(open('src/data/similarity.pkl','rb'))
+    return similarity
 
 class ML:
     def __init__(self, data):
@@ -32,12 +33,13 @@ class ML:
         self._features = ['scheme', 'property-type','bedroom-num', 'price', ]
 
     def run(self):
+        copydata =  self._data
         for feature in self._features:
-            self._data[feature] = self._data[feature].apply(clean_data)
+            copydata[feature] = copydata[feature].apply(clean_data)
         
-        self._data['desc'] = self._data.apply(combineField, axis=1)
+        copydata['desc'] = copydata.apply(combineField, axis=1)
         count = CountVectorizer(stop_words='english')
-        count_matrix = count.fit_transform(data['desc'])
+        count_matrix = count.fit_transform(copydata['desc'])
         cosine_sim = cosine_similarity(count_matrix, count_matrix)
-
+        print("running machine learning")
         pickle.dump(cosine_sim,open('src/data/similarity.pkl','wb'))

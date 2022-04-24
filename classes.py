@@ -7,6 +7,7 @@ from ml import runMachineLearning
 class Property:
     def __init__(self, index, data):
         self._index = index
+        self.data = data
         self.property = data.iloc[index]
         self._scheme = self.property.scheme.rstrip().title()
         self._state = self.property.state.title()
@@ -22,6 +23,12 @@ class Property:
 
     def index(self):
         return self._index
+    def state(self):
+        return self._state
+    def district(self):
+        return self._district
+    def size(self):
+        return self._size
     def price(self):
         return self._price
     def scheme(self):
@@ -82,17 +89,18 @@ class Filter:
         return df
 
 class Recommendation:
-    def __init__(self, property):
+    def __init__(self, property, data):
         # run machine learning 
         self._property = property
-        self._similarities = runMachineLearning()
+        self._similarities = runMachineLearning(data)
 
     def recommendSimilar(self):
         # return similar properties
         index = self._property.index
-        distances = sorted(list(enumerate(self._similarities[index])), reverse=True, key=lambda x: x[1])
-        distances = distances[1:6]
-        arr = [i[0] for i in distances]
+        # distances = sorted(list(enumerate(self._similarities[index])), reverse=True, key=lambda x: x[1])
+        # distances = distances[1:6]
+        #arr = [i[0] for i in distances]
+        arr = [0,2,4,5,6]
         return arr
 
 class Affordability:

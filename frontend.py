@@ -1,8 +1,40 @@
 import streamlit as st
 from persist import persist
 from itertools import cycle
-import math
-from classes import Property, Affordability
+import math, random
+import PIL as Image
+from classes import Property, Affordability, Recommendation
+
+def setprop(x):
+    print("set prop")
+    st.session_state['selected_prop'] = x
+    st.session_state['page'] = "propdetails"
+
+def setEval():
+    st.session_state['page'] = "affordability"
+
+def showEval():
+    st.success("Evaluation Report successfully created" )
+    st.subheader("Affordability Evaluation Report")
+
+    with st.container():
+        st.write("Monthly Net Income: RM 3200")
+        st.write("Monthly Commitment: RM 450 " )
+        st.write("Max Eligible Loan: RM 378000")
+        st.write("Monthly Installment: RM ")
+        st.write("Minimum Downpayment Required: RM 20000")
+    
+    with st.container():
+        st.subheader("Overall Recommendations")
+        st.text("This property is affordable by you")
+        st.text("You can still own a higher value property up to your max loan amount (RM 378000)")
+        
+    with st.container():
+        # find property below max loan
+        st.text("these are the property affordable for you")
+        # recommendAffordable()
+    
+    st.button("Back Home")
 class App:
     def __init__(self, data):
         self._data = data
@@ -18,19 +50,11 @@ class App:
         states = {
             # Default page.
             "page": "home",
-            # Filter options.
-            "states": ['Kuala Lumpur','Selangor'],
-            "schemelist": self._schemelist,
-            "typelist": self._typelist,
-            "roomlist": self._roomlist,
-            #"prioritylist": ['state','scheme', 'price', 'property type', 'housing size'],
 
-            # Default filter values.
-            
             "rec": False,
             "eval": False,
             "clicked": 0,
-            "sel_prop": 0,
+            "selected_prop": 0,
         }
         return states
 
@@ -45,84 +69,70 @@ class App:
             filter_form = st.form(key='filter')
             c1,c2= filter_form.columns([1,2])
             c1.selectbox('State', self._states)
-            c2.multiselect('Project Scheme e.g (Taman, Desa, etc )', self._schemelist, key = persist("scheme"))
-            filter_form.multiselect('Property Type', self._typelist, key = persist("type"))
-            filter_form.multiselect('Room Number', self._roomlist, key = persist("room"))
+            c2.multiselect('Project Scheme e.g (Taman, Desa, etc )', self._schemelist, key = "scheme")
+            filter_form.multiselect('Property Type', self._typelist, key = "type")
+            filter_form.multiselect('Room Number', self._roomlist, key = "room")
             c1,c2 = filter_form.columns(2)
-            c1.number_input("Minimum Price (RM)", self._minPrice, key=persist("minprice"))
-            c2.number_input("Maximum Price (RM)", self._maxPrice, key=persist("maxprice"))
-            
-            # filter_form.multiselect('Choose your desired priority (High to Low)', st.session_state['prioritylist'], key = persist("priority")) # get priority choosen by user
+            c1.number_input("Minimum Price (RM)", self._minPrice, key="minprice")
+            c2.number_input("Maximum Price (RM)", self._maxPrice, key="maxprice")
             submit_button = filter_form.form_submit_button("Recommends Me Property!")
         if submit_button:
             st.success("Filter Applied")
 
+    def details(self):
+        # show details of selected property
+        with st.container():
+            index = st.session_state['selected_prop']
+            st.session_state['page'] = 'home'
+            randpic = random.randint(1,3)
+            p = Property(index, self._data)
+            ptype = p.property.type +"/" + str(randpic)
+            imgpath = "src/images/" + ptype + ".jpg"
+            # img = Image.open(imgpath)
+            # st.image(img, width =500)
+            st.markdown("### " + p.scheme() + " Property")
+            st.markdown ('##### Price: RM' + str(p.price()))
+            st.text(f'{p.district()}, {p.state()}' )
+            c1, c2 = st.columns(2)
+            c1.write('Property Type: ' + str(p.type()))
+            c2.write('Tenure Type: ' + p.tenure())
+            c1, c2 = st.columns(2)
+            c1.write('Building Size (sqm): ' + str(p.size()))
+            c2.write('Bedroom Number: ' + str(p.bedroom()))
+            
+            st.button("Evaluate Affordability", help= "Check your affordability for this property" , on_click = setEval)
+
+
 
     def recommends(self):
-        pass
-    #     if st.session_state['rec']:
-    #         # arr= [0,1,2,3,4]
-    #         st.session_state['rec'] = False
-    #         # st.success(st.session_state['sel_prop'])
-    #         with st.container():
-    #             index = 1
-    #             randpic = random.randint(1,3)
-    #             ptype = getProperty().type +"/" + str(randpic)
-    #             imgpath = "src/images/semid/2.jpg"
-    #             img = Image.open(imgpath)
-    #             st.image(img, width =500)
-    #             st.markdown("### " + string.capwords(rawData.iloc[index]['scheme']) + " Property")
-    #             st.markdown ('##### Price: RM' + str(rawData.iloc[index]['price']))
-    #             st.text('Petaling, Kuala Lumpur' )
-    #             c1, c2 = st.columns(2)
-    #             c1.write('Property Type: ' + str(rawData.iloc[index]['property-type']))
-    #             c2.write('Tenure Type: ' + rawData.iloc[index]['tenure-type'])
-    #             c1, c2 = st.columns(2)
-    #             c1.write('Building Size (sqm): 354' )
-    #             c2.write('Bedroom Number: ' + str(rawData.iloc[index]['bedroom-num']))
-                
-    #             st.button("Evaluate Affordability", on_click=setEval, help= "Check your affordability for this property" )
-        
-    #         st.header("Top similar property")
-    #         arr = similarprop(index)
-    #     else:
-    #         st.header("Top Property For You")
-    #         arr = random.sample(range(0,rawData.shape[0]),5)
 
-
-
-    # # filteredImages = [] # your images here
-    # # caption = [] # your caption here
-    # # cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
-    # # for idx, filteredImage in enumerate(filteredImages):
-    # #     next(cols).image(filteredImage, width=150, caption=caption[idx])
-    #     # cols = st.columns(4)
-    #     cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
-    #     for i in range(4):
+        arr = random.sample(range(0,self._data.shape[0]),5)
+        print(st.session_state['page'])
+        if (st.session_state['page'] == 'propdetails'):
+            print("similar")
+            st.header("Top similar property")
+            p = Property(st.session_state['selected_prop'], self._data)
+            r = Recommendation(p,self._data)
+            arr = r.recommendSimilar()
+        elif (st.session_state['page'] == 'recommends'):
+            print("random")
+            st.header("Top property for you")
             
-    #         #   if property type == blah,  open image blah-#Num rand 1-5
-    #         # type = rawData.iloc[arr[i]].type
-    #         ptype = rawData.iloc[arr[i]].type + "/"
-    #         imgpath = "src/images/terrace/" + str(i+1) + ".jpg"
-    #         img = Image.open(imgpath)
+        # show 4 recommended property
+        cols = cycle(st.columns(4))
         
-    #         with next(cols):
-    #             st.image(img,use_column_width =True)
-    #             st.subheader(rawData.iloc[arr[i]].scheme +" Property ")
-    #             st.write('Property Type: '+ rawData.iloc[arr[i]]['property-type'])
-    #             st.write('Bedroom Number: ' + str(rawData.iloc[arr[i]]['bedroom-num']))
-    #             st.write('Price: RM' + str(rawData.iloc[arr[i]]['price']))
-    #             st.button("Details",key = i, on_click = setprop, args = (arr[i],))
-
-    #         # ptype = rawData.iloc[arr[i]].type + "/"
-    #         # imgpath = "src/images/" + ptype + str(1) + ".jpg"
-    #         # img = Image.open(imgpath)
-    #         # x.subheader(rawData.iloc[arr[i]].scheme +" Property ")
-    #         # x.image(img)
-    #         # x.write('Property Type: '+ rawData.iloc[arr[i]]['property-type'])
-    #         # x.write('Bedroom Number: ' + str(rawData.iloc[arr[i]]['bedroom-num']))
-    #         # x.write('Price: RM' + str(rawData.iloc[arr[i]]['price']))
-    #         # x.button("Details",key = i, on_click = setprop, args = (arr[i],))
+        for i in range(4):
+            p = Property(arr[i], self._data)
+            type = p.property.type + "/" + str(i+1)
+            # imgpath = "src/images/"+ type  + ".jpg"
+            # img = Image.open(imgpath)
+            with next(cols):
+                # st.image(img,use_column_width =True)
+                st.subheader(p.scheme() +" Property ")
+                st.write('Property Type: '+ p.type())
+                st.write('Bedroom Number: ' + str(p.bedroom()))
+                st.write('Price: RM' + str(p.price()))
+                st.button("Details",key = i, on_click = setprop, args = (arr[i],))
 
     def affordCheck(self):
 
@@ -135,17 +145,18 @@ class App:
         with fr:
             st.text_input("Property: ",prop.scheme() , disabled=True)
             st.text_input("Property Price (RM)",prop.price(), disabled=True)
-            st.number_input("Downpayment (RM) (10%)", math.ceil((10*prop.price())/100), help=prop.helpStr("dp"), key=persist("downpayment"))
+            dp = st.number_input("Downpayment (RM) (10%)", math.ceil((10*prop.price())/100), help=prop.helpStr("dp"), key="downpayment")
             with st.container():
                 st.text("Earnings and Commitment Section")
-                st.number_input("Monthly Gross Salary (RM)", value=2500, help=prop.helpStr("salary"), key=persist("salary"))
-                st.number_input("Monthly PCB (RM)", value=330, help=prop.helpStr("pcb"), key=persist("pcb"))
-                st.number_input("Current Loan (RM) (Cars, Home, PTPTN, etc) ", value=450, help=prop.helpStr("loan"), key=persist("loan"))
+                sal = st.number_input("Monthly Gross Salary (RM)", value=2500, help=prop.helpStr("salary"), key="salary")
+                pcb = st.number_input("Monthly PCB (RM)", value=330, help=prop.helpStr("pcb"), key="pcb")
+                loan = st.number_input("Current Loan (RM) (Cars, Home, PTPTN, etc) ", value=450, help=prop.helpStr("loan"), key="loan")
             with st.container():
                 st.text("Mortgage Details Section")
-                st.number_input("Loan Term (Years)", value=35, help=prop.helpStr("loanterm"), key=persist("loanterm"))
-                st.slider("Interest Rate (%)", 0.0, 20.0, 3.5, help=prop.helpStr("interest"),  key=persist("interest"))
+                loanterm = st.number_input("Loan Term (Years)", value=35, help=prop.helpStr("loanterm"), key="loanterm")
+                rate = st.slider("Interest Rate (%)", 0.0, 20.0, 3.5, help=prop.helpStr("interest"),  key="interest")
         if fr.form_submit_button("Evaluate!"):
-            # showEval()
-            # afford = Affordability(prop, st.)
-            st.session_state['eval'] = False
+            afford = Affordability(prop,dp,sal,pcb,loan,loanterm,rate)
+            eval = afford.evalAffordability()
+            showEval(eval)
+            st.session_state['page'] = "home"
