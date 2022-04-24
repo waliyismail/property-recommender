@@ -20,6 +20,12 @@ def clean_data(x):
 def combineField(x):
     return x['scheme'] + ' ' + x['property-type'] + ' bedroom'+ x['bedroom-num'] + ' price'+ x['price']
 
+# run the machine ml and save the similarity using pickle 
+def runMachineLearning(data):
+    ml = ML(data)
+    ml.run()
+    return pickle.load(open('src/data/similarity.pkl','rb'))
+
 class ML:
     def __init__(self, data):
         self._data = data

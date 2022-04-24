@@ -2,13 +2,7 @@ import pandas as pd
 import pickle
 import math
 import numpy_financial as npf
-from ml import ML
-
-def runMachineLearning():
-    data = pd.read_csv('src/data/kl_cleaned_v2.csv')
-    ml = ML(data)
-    ml.run()
-    return pickle.load(open('src/data/similarity.pkl','rb'))
+from ml import runMachineLearning
 
 class Property:
     def __init__(self, index, data):

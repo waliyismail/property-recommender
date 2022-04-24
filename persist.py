@@ -4,7 +4,7 @@ import streamlit as st
 _PERSIST_STATE_KEY = f"{__name__}_PERSIST"
 
 
-def persist(key: str) -> str:
+def persist(key: str):
     """Mark widget state as persistent."""
     if _PERSIST_STATE_KEY not in _state:
         _state[_PERSIST_STATE_KEY] = set()
