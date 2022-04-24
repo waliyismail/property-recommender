@@ -13,25 +13,34 @@ def setprop(x):
 def setEval():
     st.session_state['page'] = "affordability"
 
-def showEval():
+def showEval(eval):
     st.success("Evaluation Report successfully created" )
     st.subheader("Affordability Evaluation Report")
 
     with st.container():
-        st.write("Monthly Net Income: RM 3200")
-        st.write("Monthly Commitment: RM 450 " )
-        st.write("Max Eligible Loan: RM 378000")
-        st.write("Monthly Installment: RM ")
-        st.write("Minimum Downpayment Required: RM 20000")
+        st.text_input("Monthly Net Income: ", "RM" + eval['net income'], disabled=True)
+        st.text_input("Monthly Commitment: ", "RM" + eval['commitment'], disabled=True)
+        c1,c2= st.columns(2)
+        c1.text_input("Loan Required: ", "RM" + eval["max loan"], disabled=True)
+        c2.text_input("Max Eligible Loan: ", "RM" + eval["max loan"], disabled=True)
+        c1,c2= st.columns(2)
+        c1.text_input("Monthly Installment Required: ", "RM" + eval["eligible installment"], disabled=True)
+        c2.text_input("Affordable Monthly Installment: ", "RM" + eval["eligible installment"], disabled=True)
+        st.text_input("Minimum Downpayment Required:", "RM" + eval["min downpayment"], disabled=True)
     
     with st.container():
         st.subheader("Overall Recommendations")
-        st.text("This property is affordable by you")
-        st.text("You can still own a higher value property up to your max loan amount (RM 378000)")
+        if (eval['eligibility']):
+            st.text("This property is affordable by you")
+            st.text(f"You can still own a higher value property up to your max loan amount (RM{eval['max loan']})")
+        else:
+            st.text("This property is not affordable by you")
+            st.text(f"In order to own this property you need to prepare higher downpayment (RM{eval['min downpayment']})")
+            st.text(f"Try finding property below your max loan (RM{eval['max loan']})")
         
     with st.container():
         # find property below max loan
-        st.text("these are the property affordable for you")
+        st.text("Consider these property below")
         # recommendAffordable()
     
     st.button("Back Home")
@@ -139,8 +148,8 @@ class App:
         # view property details
         st.subheader("Affordability Checker")
         st.text("Simply fill up the following to check whether this property is worth for you")
-        # index = st.session_state['selected_prop']
-        prop = Property(0, self._data)
+        index = st.session_state['selected_prop']
+        prop = Property(index, self._data)
         fr = st.form("eval-form")
         with fr:
             st.text_input("Property: ",prop.scheme() , disabled=True)

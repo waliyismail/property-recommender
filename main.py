@@ -12,7 +12,6 @@ def main():
 
     page = "home"
     PAGES[page]()
-    showEval()
     page = st.session_state['page']
     print(page)
     if( page == 'propdetails'):

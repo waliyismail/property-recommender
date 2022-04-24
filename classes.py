@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import pickle
 import math
@@ -119,12 +120,14 @@ class Affordability:
         commitment = self._loans
         maxdebt = 0.7 * net_income
         instalment = maxdebt - commitment
-        maxloan = instalment * 200
-        mindp = self._price - maxloan if (self._price > maxloan) else self._downpayment
+        maxloan = math.ceil(instalment * 200)
+        reqloan = math.ceil(self._price * 0.9)
+        mindp = math.ceil(self._price - maxloan if (self._price > maxloan) else self._downpayment)
         interestRate = self._interest/100 # in decimal
         period = self._loanterm * 12 # in months
         eligibleInst = math.ceil(npf.pmt(interestRate/12, period, maxloan) * -1)
+        reqInst = math.ceil(npf.pmt(interestRate/12, period, reqloan) * -1)
         eligibility = True if (self._price < maxloan) else False
-        return {"net income": net_income, "commitment": commitment, "max loan": maxloan,
-                    "eligible installment": eligibleInst, "minimum downpayment": mindp, 
-                    "eligibility": eligibility }
+        return {"net income": str(net_income), "commitment": str(commitment), "max loan": str(maxloan), 
+                    "required loan": str(reqloan),"required installment": str(reqInst), "eligible installment": str(eligibleInst), 
+                    "min downpayment": str(mindp), "eligibility": eligibility }
