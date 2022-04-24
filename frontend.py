@@ -1,7 +1,8 @@
 import streamlit as st
 from persist import persist
 from itertools import cycle
-
+import math
+from classes import Property, Affordability
 class App:
     def __init__(self, data):
         self._data = data
@@ -123,29 +124,28 @@ class App:
     #         # x.write('Price: RM' + str(rawData.iloc[arr[i]]['price']))
     #         # x.button("Details",key = i, on_click = setprop, args = (arr[i],))
 
-    def affordCheck():
+    def affordCheck(self):
 
-        #st.success(st.session_state['sel_prop'])
         # view property details
         st.subheader("Affordability Checker")
         st.text("Simply fill up the following to check whether this property is worth for you")
-        
-        prop = getProperty()
-        
+        # index = st.session_state['selected_prop']
+        prop = Property(0, self._data)
         fr = st.form("eval-form")
         with fr:
-            st.text_input("Property: ",prop.scheme , disabled=True)
-            st.text_input("Property Price (RM)",prop.price, disabled=True)
-            st.number_input("Downpayment (RM) (10%)", (10*prop.price)/100, key=persist("downpayment"))
+            st.text_input("Property: ",prop.scheme() , disabled=True)
+            st.text_input("Property Price (RM)",prop.price(), disabled=True)
+            st.number_input("Downpayment (RM) (10%)", math.ceil((10*prop.price())/100), help=prop.helpStr("dp"), key=persist("downpayment"))
             with st.container():
                 st.text("Earnings and Commitment Section")
-                st.number_input("Monthly Gross Salary (RM)",  key=persist("salary"))
-                st.number_input("Monthly PCB (RM)",  key=persist("pcb"))
-                st.number_input("Current Loan (RM) (Cars, Home, PTPTN, etc) ",  key=persist("loan"))
+                st.number_input("Monthly Gross Salary (RM)", value=2500, help=prop.helpStr("salary"), key=persist("salary"))
+                st.number_input("Monthly PCB (RM)", value=330, help=prop.helpStr("pcb"), key=persist("pcb"))
+                st.number_input("Current Loan (RM) (Cars, Home, PTPTN, etc) ", value=450, help=prop.helpStr("loan"), key=persist("loan"))
             with st.container():
                 st.text("Mortgage Details Section")
-                st.number_input("Loan Term (Years)",min_value = 10, key=persist("loanterm"))
-                st.slider("Interest Rate (%)", 0.0, 10.0, 3.5,  key=persist("interest"))
+                st.number_input("Loan Term (Years)", value=35, help=prop.helpStr("loanterm"), key=persist("loanterm"))
+                st.slider("Interest Rate (%)", 0.0, 20.0, 3.5, help=prop.helpStr("interest"),  key=persist("interest"))
         if fr.form_submit_button("Evaluate!"):
-            showEval()
+            # showEval()
+            # afford = Affordability(prop, st.)
             st.session_state['eval'] = False

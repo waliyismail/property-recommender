@@ -24,9 +24,28 @@ class Property:
         return self._index
     def price(self):
         return self._price
+    def scheme(self):
+        return self._scheme
+    def type(self):
+        return self._type
+    def tenure(self):
+        return self._tenure
+    def bedroom(self):
+        return self._bedroom
 
     def showProperty(self):
         pass
+    
+    def helpStr(self, field):
+        helpText = {
+                    "dp": '10\% of property price', 
+                    "salary": "Your gross salary per month",
+                    "pcb": "Potongan Cukai Bulanan (income tax)",
+                    "loan": "Sum of your total loans",
+                    "loanterm": "How long you plan to loan",
+                    "interest": "How much your bank's interest rate"
+                        }
+        return helpText[field]
 
     def __str__(self):
         return f'{self._scheme} Property at {self._district} RM{self._price} with {self._bedroom} rooms'

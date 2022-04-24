@@ -10,7 +10,7 @@ def main():
         # Initialize session state.
         st.session_state.update(app.setStates())
 
-    page = "home"
+    page = "affordability"
     PAGES[page]()
     if(st.session_state['rec']):
         PAGES["recommend"]()
