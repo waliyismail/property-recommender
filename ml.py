@@ -22,10 +22,8 @@ def combineField(x):
 
 # run the machine ml and save the similarity using pickle 
 def runMachineLearning(data):
-    ml = ML(data)
+    ml = ML(data, {})
     ml.run()
-    similarity = pickle.load(open('src/data/similarity.pkl','rb'))
-    return similarity
 
 def setConstraint(data, constraint: dict):
         #set the data from the constraint
