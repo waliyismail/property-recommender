@@ -4,7 +4,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import pickle
 
-
 # Function to convert all strings to lower case and strip names of spaces
 def clean_data(x):
     if isinstance(x, list):

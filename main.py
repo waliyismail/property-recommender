@@ -2,7 +2,7 @@ from ml import runMachineLearning
 import streamlit as st
 import pandas as pd
 from persist import load_widget_state
-from frontend import App, showEval
+from frontend import App
 
 data= pd.read_csv('src/data/kl_cleaned_v2.csv')
 app = App(data)
@@ -18,14 +18,15 @@ def main():
     if( page == 'propdetails'):
         print(1)
         PAGES["propdetails"]()
-        PAGES["recommend"](-1)
+        PAGES["recommend"](st.session_state['affordable'])
     elif(page == 'affordability'):
         print(2)
         PAGES['affordability']()
+        # PAGES["recommend"](st.session_state['affordable'])
     else:
         print(3)
         PAGES["filter"]()
-        PAGES["recommend"](-1)
+        PAGES["recommend"](st.session_state['affordable'])
     print("=====one loop====")
 
 PAGES = {

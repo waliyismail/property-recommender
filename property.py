@@ -1,9 +1,11 @@
 import streamlit as st
+import pandas as pd
+import pickle
 # class for property
+data= pd.read_csv('src/data/kl_cleaned_v2.csv')
 class Property:
-    def __init__(self, index, data):
+    def __init__(self, index):
         self._index = index
-        self.data = data
         self.property = data.iloc[index]
         self._scheme = self.property.scheme.rstrip().title()
         self._state = self.property.state.title()
@@ -40,20 +42,18 @@ class Property:
 
         if(option == "details"):
             # show in more details
-            st.session_state['page'] = 'propdetails'
             print("property details page")
-            with st.container():
-                st.markdown("### " + self.scheme() + " Property")
-                st.markdown ('##### Price: RM' + str(self.price()))
-                st.text(f'{self.district()}, {self.state()}' )
-                c1, c2 = st.columns(2)
-                c1.write('Property Type: ' + str(self.type()))
-                c2.write('Tenure Type: ' + self.tenure())
-                c1, c2 = st.columns(2)
-                c1.write('Building Size (sqm): ' + str(self.size()))
-                c2.write('Bedroom Number: ' + str(self.bedroom()))
-                
-                st.button("Evaluate Affordability", help= "Check your affordability for this property" , on_click = self.setEval)
+            st.markdown("### " + self.scheme() + " Property")
+            st.markdown ('##### Price: RM' + str(self.price()))
+            st.text(f'{self.district()}, {self.state()}' )
+            c1, c2 = st.columns(2)
+            c1.write('Property Type: ' + str(self.type()))
+            c2.write('Tenure Type: ' + self.tenure())
+            c1, c2 = st.columns(2)
+            c1.write('Building Size (sqm): ' + str(self.size()))
+            c2.write('Bedroom Number: ' + str(self.bedroom()))
+            
+            st.button("Evaluate Affordability", help= "Check your affordability for this property" , on_click = self.setEval)
         elif(option == "list"):
             # show in list form
 
@@ -63,7 +63,6 @@ class Property:
             st.write('Price: RM' + str(self.price()))
             st.button("Details",key = self.index(), on_click = self.setprop, args = (self.index(),))
         
-    
     def helpStr(self, field):
         helpText = {
                     "dp": '10\% of property price', 
@@ -82,5 +81,14 @@ class Property:
 
     def setEval(self):
         st.session_state['page'] = "affordability"
+
+    def similarProp(self, limit):
+        # return the indexes of top 50 property
+        similarity = pickle.load(open('src/data/similarity.pkl','rb'))
+        distances = sorted(list(enumerate(similarity[self.index()])), reverse=True, key=lambda x: x[1])
+        distances = distances[1:50]
+        arr = [i[0] for i in distances]
+        return arr[0:limit]
+
     def __str__(self):
         return f'{self._scheme} Property at {self._district} RM{self._price} with {self._bedroom} rooms'

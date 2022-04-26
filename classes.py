@@ -1,66 +1,4 @@
-import re
-import pandas as pd
-import pickle
-import math
-import numpy_financial as npf
-from ml import runMachineLearning
-
-class Property:
-    def __init__(self, index, data):
-        self._index = index
-        self.data = data
-        self.property = data.iloc[index]
-        self._scheme = self.property.scheme.rstrip().title()
-        self._state = self.property.state.title()
-        self._district = self.property.district.title()
-        self._type = self.property["property-type"].title()
-        if (self.property["bldg-size"] != 0):
-            self._size = self.property["bldg-size"]
-        else:
-            self._size = "No Information"
-        self._price = self.property.price
-        self._tenure = self.property["tenure-type"].title()
-        self._bedroom = self.property["bedroom-num"]
-
-    def index(self):
-        return self._index
-    def state(self):
-        return self._state
-    def district(self):
-        return self._district
-    def size(self):
-        return self._size
-    def price(self):
-        return self._price
-    def scheme(self):
-        return self._scheme
-    def type(self):
-        return self._type
-    def tenure(self):
-        return self._tenure
-    def bedroom(self):
-        return self._bedroom
-
-    def showProperty(self, option):
-        pass
-        
-    
-    def helpStr(self, field):
-        helpText = {
-                    "dp": '10\% of property price', 
-                    "salary": "Your gross salary per month",
-                    "pcb": "Potongan Cukai Bulanan (income tax)",
-                    "loan": "Sum of your total loans",
-                    "loanterm": "How long you plan to loan",
-                    "interest": "How much your bank's interest rate"
-                        }
-        return helpText[field]
-
-    def __str__(self):
-        return f'{self._scheme} Property at {self._district} RM{self._price} with {self._bedroom} rooms'
-
-
-class Filter:
+class propFilter:
     def __init__(self, state, schemes, types, rooms, minprice, maxprice):
         self._state = state
         self._schemes = schemes
@@ -70,6 +8,8 @@ class Filter:
         self._maxprice = maxprice
 
     def filter(self, data):
+
+
         df = data
 
         if self._schemes:
@@ -90,51 +30,11 @@ class Filter:
 
         return df
 
-class Recommendation:
-    def __init__(self, property, data):
-        # run machine learning 
-        self._property = property
-        self._similarities = runMachineLearning(data)
+def filtering():
+    # get all similarites indexs
+    # find the associate property object
+    similarity = pickle.load(open('src/data/similarity.pkl','rb'))
+    distances = sorted(list(enumerate(similarity[self.index()])), reverse=True, key=lambda x: x[1])
+    distances = distances[1:50]
+    arr = [i[0] for i in distances]
 
-    def recommendSimilar(self):
-        # return similar properties
-        index = self._property.index
-
-        # distances = sorted(list(enumerate(self._similarities[index])), reverse=True, key=lambda x: x[1])
-        # distances = distances[1:6]
-        #arr = [i[0] for i in distances]
-        arr = [0,2,4,5,6]
-        return arr
-
-class Affordability:
-    def __init__(self, property, dp, salary, pcb, loans, loanterm, interest):
-        self._property = property
-        self._price = property.price()
-        self._downpayment = property.price() * 0.1 if (dp) else dp
-        self._salary = salary
-        self._pcb = pcb
-        self._loans = loans
-        self._loanterm = loanterm
-        self._interest = interest
-    
-    def filterAffordable(self, data, maxloan):  
-        df = data
-        df =df[(df['price'] <= (maxloan))]
-        return df
-
-    def evalAffordability(self):
-        net_income = self._salary - self._pcb
-        commitment = self._loans
-        maxdebt = 0.7 * net_income
-        instalment = maxdebt - commitment
-        maxloan = math.ceil(instalment * 200)
-        reqloan = math.ceil(self._price * 0.9)
-        mindp = math.ceil(self._price - maxloan if (self._price > maxloan) else self._downpayment)
-        interestRate = self._interest/100 # in decimal
-        period = self._loanterm * 12 # in months
-        eligibleInst = math.ceil(npf.pmt(interestRate/12, period, maxloan) * -1)
-        reqInst = math.ceil(npf.pmt(interestRate/12, period, reqloan) * -1)
-        eligibility = True if (self._price < maxloan) else False
-        return {"net income": str(net_income), "commitment": str(commitment), "max loan": str(maxloan), 
-                    "required loan": str(reqloan),"required installment": str(reqInst), "eligible installment": str(eligibleInst), 
-                    "min downpayment": str(mindp), "eligibility": eligibility }
