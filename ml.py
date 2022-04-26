@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import pickle
 
+
 # Function to convert all strings to lower case and strip names of spaces
 def clean_data(x):
     if isinstance(x, list):
@@ -30,9 +31,9 @@ def setConstraint(data, constraint: dict):
         #apply the constraint in the dataset
 
         df = data
-
         for i in constraint:
-            df = df[df[i] < constraint[i]]
+            if( constraint[i] != -1):
+                df = df[df[i] < constraint[i]]
 
         return df
 

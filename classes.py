@@ -41,8 +41,9 @@ class Property:
     def bedroom(self):
         return self._bedroom
 
-    def showProperty(self):
+    def showProperty(self, option):
         pass
+        
     
     def helpStr(self, field):
         helpText = {
