@@ -4,8 +4,8 @@ from persist import persist
 from itertools import cycle
 import math, random
 import PIL as Image
+import pickle
 from classes import Property, Affordability, Recommendation
-
 def setprop(x):
     print("set prop")
     st.session_state['selected_prop'] = x
@@ -13,6 +13,13 @@ def setprop(x):
 
 def setEval():
     st.session_state['page'] = "affordability"
+
+def similarprop(index):
+    similarity = pickle.load(open('src/data/similarity.pkl','rb'))
+    distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
+    distances = distances[1:6]
+    arr = [i[0] for i in distances]
+    return arr
 
 def showEval(eval):
     st.success("Evaluation Report successfully created" )
@@ -63,7 +70,6 @@ class App:
 
             "rec": False,
             "eval": False,
-            "clicked": 0,
             "selected_prop": 0,
         }
         return states
@@ -91,6 +97,8 @@ class App:
 
     def details(self):
         # show details of selected property
+        st.session_state['page'] = 'propdetails'
+        print("property details page")
         with st.container():
             index = st.session_state['selected_prop']
             st.session_state['page'] = 'home'
@@ -117,16 +125,17 @@ class App:
     def recommends(self , ml):
 
         arr = random.sample(range(0,self._data.shape[0]),5)
-        print(st.session_state['page'])
+        print(st.session_state['selected_prop'])
 
-        if (st.session_state['page'] == 'propdetails'):
+        if (st.session_state['selected_prop']):
             print("similar")
-            st.header("Top similar property")
             p = Property(st.session_state['selected_prop'], self._data)
-            r = Recommendation(p,self._data)
-            arr = r.recommendSimilar(ml)
+            # r = Recommendation(p,self._data)
+            # arr = r.recommendSimilar(ml)
+            arr = similarprop(st.session_state['selected_prop'])
+            st.header("Top property for you")
             
-        elif (st.session_state['page'] == 'recommends'):
+        else:
             print("random")
             st.header("Top property for you")
             
@@ -172,7 +181,6 @@ class App:
             afford = Affordability(prop,dp,sal,pcb,loan,loanterm,rate)
             eval = afford.evalAffordability()
             showEval(eval)
-            runMachineLearning(df)
-            st.header("Top similar property")
+            # runMachineLearning(df)
             self.recommends(int(eval['max loan']))
             st.session_state['page'] = "home"

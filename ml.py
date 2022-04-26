@@ -27,11 +27,23 @@ def runMachineLearning(data):
     similarity = pickle.load(open('src/data/similarity.pkl','rb'))
     return similarity
 
+def setConstraint(data, constraint: dict):
+        #set the data from the constraint
+        #apply the constraint in the dataset
+
+        df = data
+
+        for i in constraint:
+            df = df[df[i] < constraint[i]]
+
+        return df
+
 class ML:
-    def __init__(self, data):
-        self._data = data
+    def __init__(self, data, constraint):
+        self._data = setConstraint(data, constraint)
         self._features = ['scheme', 'property-type','bedroom-num', 'price', ]
 
+    
     def run(self):
         copydata =  self._data
         for feature in self._features:
