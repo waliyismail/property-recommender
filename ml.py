@@ -25,20 +25,10 @@ def runMachineLearning(data):
     ml = ML(data)
     ml.run()
 
-def setConstraint(data, constraint: dict):
-        #set the data from the constraint
-        #apply the constraint in the dataset
-
-        df = data
-        for i in constraint:
-            if( constraint[i] != -1):
-                df = df[df[i] < constraint[i]]
-
-        return df
 
 class ML:
     def __init__(self, data):
-        self._data = setConstraint(data)
+        self._data = data
         self._features = ['scheme', 'property-type','bedroom-num', 'price', ]
 
     

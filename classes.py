@@ -9,7 +9,7 @@ class propFilter:
 
     def filter(self, data):
 
-
+        left = []
         df = data
 
         if self._schemes:
