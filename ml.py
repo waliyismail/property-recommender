@@ -22,7 +22,7 @@ def combineField(x):
 
 # run the machine ml and save the similarity using pickle 
 def runMachineLearning(data):
-    ml = ML(data, {})
+    ml = ML(data)
     ml.run()
 
 def setConstraint(data, constraint: dict):
@@ -37,8 +37,8 @@ def setConstraint(data, constraint: dict):
         return df
 
 class ML:
-    def __init__(self, data, constraint):
-        self._data = setConstraint(data, constraint)
+    def __init__(self, data):
+        self._data = setConstraint(data)
         self._features = ['scheme', 'property-type','bedroom-num', 'price', ]
 
     

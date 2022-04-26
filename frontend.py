@@ -1,5 +1,6 @@
 from affordability import Affordability
 from classes import propFilter
+from ml import runMachineLearning
 import streamlit as st
 from itertools import cycle
 import math, random
@@ -51,6 +52,7 @@ class App:
             fil = propFilter(state, schemes, types, rooms, minprice, maxprice)
             df = fil.filter(self._data)
             # change the data to df
+            runMachineLearning(df)
             st.success("Filter Applied")
 
     def details(self):

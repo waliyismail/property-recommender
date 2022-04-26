@@ -6,6 +6,7 @@ from frontend import App
 
 data= pd.read_csv('src/data/kl_cleaned_v2.csv')
 app = App(data)
+#runMachineLearning(data)
 def main():
     if "page" not in st.session_state:
         # Initialize session state.
