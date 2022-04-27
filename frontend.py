@@ -1,11 +1,12 @@
 from affordability import Affordability
-from classes import propFilter
-from ml import runMachineLearning
+from filters import propFilter
 import streamlit as st
 from itertools import cycle
 import math, random
 from property import Property
-    
+from PIL import Image
+
+
 class App:
     def __init__(self, data):
         self._data = data
@@ -13,6 +14,7 @@ class App:
         self._minPrice = data['price'].min().item()
         self._maxPrice = data['price'].max().item()
         self._propertylist = data['address'].values
+        self._mukimlist = sorted(data['district'].unique())
         self._schemelist = sorted(data['scheme'].unique())
         self._roomlist = sorted(data['bedroom-num'].unique())
         self._typelist = sorted(data['property-type'].unique())
@@ -40,7 +42,8 @@ class App:
             filter_form = st.form(key='filter')
             c1,c2= filter_form.columns([1,2])
             state = c1.selectbox('State', self._states)
-            schemes = c2.multiselect('Project Scheme e.g (Taman, Desa, etc )', self._schemelist, key = "scheme")
+            district = c2.multiselect('Mukim', self._mukimlist, key = "mukim")
+            schemes = filter_form.multiselect('Project Scheme e.g (Taman, Desa, etc )', self._schemelist, key = "scheme")
             types = filter_form.multiselect('Property Type', self._typelist, key = "type")
             rooms = filter_form.multiselect('Room Number', self._roomlist, key = "room")
             c1,c2 = filter_form.columns(2)
@@ -49,10 +52,10 @@ class App:
             submit_button = filter_form.form_submit_button("Recommends Me Property!")
         if submit_button:
             # run filter algorithm
-            fil = propFilter(state, schemes, types, rooms, minprice, maxprice)
-            df = fil.filter(self._data)
+            f = propFilter(district, schemes, types, rooms, minprice, maxprice)
+            arr = f.filtering()
             # change the data to df
-            runMachineLearning(df)
+            # runMachineLearning(df)
             st.success("Filter Applied")
 
     def details(self):
@@ -62,7 +65,9 @@ class App:
         index = st.session_state['selected_prop']
         if(index != -1):
             p =  Property(index)
+            img = Image.open("src/images/" + p.property.type + "5.jpg")
             with st.container():
+                st.image(img)
                 p.showProperty("details")
         else:
             print("index error" + str(index))
@@ -100,7 +105,10 @@ class App:
         
         for i in range(4):
             p = Property(arr[i])
+            type = p.property.type + str(i+1)
+            img = Image.open("src/images/" + type + ".jpg")
             with next(cols):
+                st.image(img)
                 p.showProperty("list")
 
     def affordCheck(self):
@@ -129,4 +137,3 @@ class App:
             eval = afford.evalAffordability()
             afford.showEval(eval)
             self.recommends(int(eval['max loan']))
-            # st.session_state['page'] = "recommends"

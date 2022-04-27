@@ -1,6 +1,7 @@
+from property import Property
 class propFilter:
-    def __init__(self, state, schemes, types, rooms, minprice, maxprice):
-        self._state = state
+    def __init__(self, district, schemes, types, rooms, minprice, maxprice):
+        self._district = district
         self._schemes = schemes
         self._types = types
         self._rooms = rooms
@@ -30,11 +31,24 @@ class propFilter:
 
         return df
 
-def filtering():
-    # get all similarites indexs
-    # find the associate property object
-    similarity = pickle.load(open('src/data/similarity.pkl','rb'))
-    distances = sorted(list(enumerate(similarity[self.index()])), reverse=True, key=lambda x: x[1])
-    distances = distances[1:50]
-    arr = [i[0] for i in distances]
+    def filtering(self):
+        r = 13374
+        arr = []
+        for i in range(r):
+            p = Property(i)
+            if p.scheme not in self._schemes:
+                continue
+            if p.bedroom() not in self._rooms:
+                continue
+            if p.type() not in self._types:
+                continue
+            if p.district() not in self._district:
+                continue
+            if p.price() not in range(self._minprice, self._maxprice+1):
+                continue
+            arr.append(i)
+        return arr
+        
+
+
 
