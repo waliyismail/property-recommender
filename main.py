@@ -14,7 +14,7 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 data= pd.read_csv('src/data/kl_cleaned_v2.csv')
 app = App(data)
-#runMachineLearning(data)
+# runMachineLearning(data)
 def main():
     
     if "page" not in st.session_state:

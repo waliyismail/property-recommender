@@ -36,7 +36,7 @@ class propFilter:
         arr = []
         for i in range(r):
             p = Property(i)
-            if p.scheme not in self._schemes:
+            if p.scheme() not in self._schemes:
                 continue
             if p.bedroom() not in self._rooms:
                 continue
