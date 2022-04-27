@@ -39,7 +39,7 @@ def main():
         PAGES["recommend"](st.session_state['affordable'])
     print("=====one loop====")
 
-    st.button("home", on_click =st.session_state.update(app.setStates()) )
+    # st.button("home", on_click =st.session_state.update(app.setStates()) )
         
         # st.session_state['page'] = "home"
 

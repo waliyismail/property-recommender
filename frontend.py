@@ -76,7 +76,7 @@ class App:
         arr = random.sample(range(0,self._data.shape[0]),5)
         print("property index = " + str(st.session_state['selected_prop']))
         print(af)
-        if (st.session_state['selected_prop']):
+        if (st.session_state['selected_prop'] != -1):
             print("similar")
             index = st.session_state['selected_prop']
             p =  Property(index)
@@ -108,7 +108,7 @@ class App:
             type = p.property.type + str(i+1)
             img = Image.open("src/images/" + type + ".jpg")
             with next(cols):
-                st.image(img)
+                st.image(img, use_column_width=True)
                 p.showProperty("list")
 
     def affordCheck(self):
@@ -117,6 +117,7 @@ class App:
         st.subheader("Affordability Checker")
         st.text("Simply fill up the following to check whether this property is worth for you")
         index = st.session_state['selected_prop']
+        print("what" + str(index))
         prop = Property(index)
         fr = st.form("eval-form")
         with fr:
